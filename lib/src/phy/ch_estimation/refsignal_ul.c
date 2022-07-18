@@ -246,7 +246,7 @@ static void compute_r(srsran_refsignal_ul_t*             q,
   if (nof_prb >= 6 && cfg->sequence_hopping_en) {
     v = q->v_pusch[ns][cfg->delta_ss];
   }
-
+  // NOTE: UE call generate ZC sequence
   // Compute signal argument
   srsran_zc_sequence_generate_lte(u, v, alpha, nof_prb, sequence);
 }

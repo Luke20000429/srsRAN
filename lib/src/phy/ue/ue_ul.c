@@ -300,7 +300,10 @@ static void apply_norm(srsran_ue_ul_t* q, srsran_ue_ul_cfg_t* cfg, float norm_fa
 
 static void add_srs(srsran_ue_ul_t* q, srsran_ue_ul_cfg_t* cfg, uint32_t tti)
 {
+  // fprintf(stderr, "[M: %s] called!\n", __func__);
+  // NOTE: srs_tx is disabled by default
   if (srs_tx_enabled(&cfg->ul_cfg.srs, tti)) {
+    fprintf(stderr, "[M: %s] srs tx is enabled!\n", __func__);
     if (q->signals_pregenerated) {
       srsran_refsignal_srs_pregen_put(&q->signals, &q->pregen_srs, &cfg->ul_cfg.srs, tti, q->sf_symbols);
     } else {
@@ -438,6 +441,7 @@ static int srs_encode(srsran_ue_ul_t* q, uint32_t tti, srsran_ue_ul_cfg_t* cfg)
   if (q && cfg) {
     srsran_vec_cf_zero(q->sf_symbols, SRSRAN_NOF_RE(q->cell));
 
+    // NOTE: ue add SRS here
     add_srs(q, cfg, tti);
 
     srsran_ofdm_tx_sf(&q->fft);
@@ -469,7 +473,7 @@ float srs_power(srsran_ue_ul_t* q, srsran_ue_ul_cfg_t* cfg, float PL)
 
   // TODO: This implements closed-loop power control
   float f = 0;
-
+  // NOTE: What this SRS used for?
   uint32_t M_sc = srsran_refsignal_srs_M_sc(&q->signals, &cfg->ul_cfg.srs);
 
   float p_srs_offset;

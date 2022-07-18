@@ -355,6 +355,7 @@ static void chest_ul_estimate(srsran_chest_ul_t*     q,
     }
   }
 
+  // NOTE: correlation? pilot_recv_signal is SRS
   // Measure reference signal RE average power
   cf_t  corr     = srsran_vec_acc_cc(q->pilot_recv_signal, nslots * nrefs_sym) / (nslots * nrefs_sym);
   float rsrp_avg = __real__ corr * __real__ corr + __imag__ corr * __imag__ corr;
@@ -493,6 +494,7 @@ int srsran_chest_ul_estimate_pucch(srsran_chest_ul_t*     q,
     srsran_vec_prod_conj_ccc(q->pilot_recv_signal, q->pilot_known_signal, q->pilot_estimates, nrefs_sf);
   }
 
+  // NOTE: correlation?
   // Measure reference signal RE average power
   cf_t corr = srsran_vec_acc_cc(q->pilot_estimates, SRSRAN_NOF_SLOTS_PER_SF * SRSRAN_NRE * n_rs) /
               (SRSRAN_NOF_SLOTS_PER_SF * SRSRAN_NRE * n_rs);
@@ -520,6 +522,7 @@ int srsran_chest_ul_estimate_pucch(srsran_chest_ul_t*     q,
       }
     }
 
+    // NOTE: Time alignment
     // Calculate actual time alignment error in micro-seconds
     if (isnormal(ta_err)) {
       ta_err /= 15e3f;                             // Convert from normalized frequency to seconds
@@ -602,7 +605,9 @@ int srsran_chest_ul_estimate_srs(srsran_chest_ul_t*                 q,
   // Extract parameters
   uint32_t n_srs_re = srsran_refsignal_srs_M_sc(&q->dmrs_signal, cfg);
 
+  // NOTE: sounding reference signal SRS
   // Extract Sounding Reference Signal
+  // ERROR("chest: Extract SRS\n");
   if (srsran_refsignal_srs_get(&q->dmrs_signal, cfg, sf->tti, q->pilot_recv_signal, input) != SRSRAN_SUCCESS) {
     return SRSRAN_ERROR;
   }

@@ -601,7 +601,7 @@ int main(int argc, char* argv[])
   srsran::metrics_hub<enb_metrics_t> metricshub;
   metrics_stdout                     metrics_screen;
 
-  cout << "---  Software Radio Systems LTE eNodeB  ---" << endl << endl;
+  cout << "---  Software Radio Systems LTE eNodeB [Customized] ---" << endl << endl;
 
   srsran_debug_handle_crash(argc, argv);
   parse_args(&args, argc, argv);

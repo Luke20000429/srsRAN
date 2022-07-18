@@ -2271,7 +2271,8 @@ int parse_sibs(all_args_t* args_, rrc_cfg_t* rrc_cfg_, srsenb::phy_cfg_t* phy_co
   if (sib_sections::parse_sib2(args_->enb_files.sib_config, sib2) != SRSRAN_SUCCESS) {
     return SRSRAN_ERROR;
   }
-
+  
+  // NOTE: Here indicates SRS is not supported on eNB
   // SRS not yet supported
   sib2->rr_cfg_common.srs_ul_cfg_common.set(srs_ul_cfg_common_c::types::release);
   if (sib2->freq_info.ul_bw_present) {

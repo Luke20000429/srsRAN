@@ -167,6 +167,7 @@ int ue::init(const all_args_t& args_)
   radio   = std::move(lte_radio);
 
   if (phy) {
+    srsran::console("Add customer modification\n");
     srsran::console("Waiting PHY to initialize ... ");
     phy->wait_initialize();
     srsran::console("done!\n");

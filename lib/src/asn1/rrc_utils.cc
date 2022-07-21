@@ -627,7 +627,7 @@ void set_phy_cfg_t_dedicated_cfg(phy_cfg_t* cfg, const asn1::rrc::phys_cfg_ded_s
     cfg->dl_cfg.pdsch.use_tbs_index_alt = false;
   }
 
-  if (asn1_type.srs_ul_cfg_ded_present) {
+  if (asn1_type.srs_ul_cfg_ded_present) { // NOTE: Ded SRS configed here
     cfg->ul_cfg.srs.dedicated_enabled = asn1_type.srs_ul_cfg_ded.type() == asn1::rrc::setup_e::setup;
     if (cfg->ul_cfg.srs.dedicated_enabled) {
       cfg->ul_cfg.srs.configured = cfg->ul_cfg.srs.dedicated_enabled and cfg->ul_cfg.srs.common_enabled;
@@ -780,7 +780,7 @@ void set_phy_cfg_t_scell_config(phy_cfg_t* cfg, const asn1::rrc::scell_to_add_mo
       cfg->ul_cfg.power_ctrl.p0_nominal_pusch = ul_pwr_ctrl_common_scell_r10->p0_nominal_pusch_r10;
       cfg->ul_cfg.power_ctrl.alpha            = ul_pwr_ctrl_common_scell_r10->alpha_r10.to_number();
 
-      // Parse SRS
+      // Parse SRS NOTE: SRS is parsed here
       cfg->ul_cfg.srs.common_enabled = ul_cfg_r10->srs_ul_cfg_common_r10.type() == asn1::rrc::setup_e::setup;
       if (cfg->ul_cfg.srs.common_enabled) {
         auto* srs_ul_cfg_common         = &ul_cfg_r10->srs_ul_cfg_common_r10.setup();
@@ -888,7 +888,7 @@ void set_phy_cfg_t_scell_config(phy_cfg_t* cfg, const asn1::rrc::scell_to_add_mo
           }
         }
 
-        // Sounding reference signals Dedicated
+        // Sounding reference signals Dedicated NOTE: Ded config of SRS set here
         if (ul_cfg_r10->srs_ul_cfg_ded_r10_present) {
           cfg->ul_cfg.srs.dedicated_enabled = ul_cfg_r10->srs_ul_cfg_ded_r10.type() == asn1::rrc::setup_e::setup;
           if (cfg->ul_cfg.srs.dedicated_enabled) {

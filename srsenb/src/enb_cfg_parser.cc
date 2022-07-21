@@ -2028,6 +2028,35 @@ int parse_sib2(std::string filename, sib_type2_s* data)
   ulrs_cnfg.add_field(new parser::field<bool>("sequence_hopping_enabled",
                                               &rr_cfg_common->pusch_cfg_common.ul_ref_sigs_pusch.seq_hop_enabled));
 
+  // NOTE: modify parser to force enable srs_ul
+  // SRS_UL_CNFG configuration
+  parser::section srs_ul_cnfg("srs_ul");
+  rr_config.add_subsection(&srs_ul_cnfg);
+
+  srs_ul_cnfg.add_field(
+    make_asn1_enum_number_parser("bw_cnfg", &rr_cfg_common->srs_ul_cfg_common.setup().srs_bw_cfg)
+  );
+  srs_ul_cnfg.add_field(
+    make_asn1_enum_number_parser("subfr_cnfg", &rr_cfg_common->srs_ul_cfg_common.setup().srs_sf_cfg)
+  );
+  srs_ul_cnfg.add_field(
+    new parser::field<bool>
+    ("ack_nack_simul_tx", &rr_cfg_common->srs_ul_cfg_common.setup().ack_nack_srs_simul_tx)
+  );
+  srs_ul_cnfg.add_field(
+    new parser::field<bool>
+    ("max_up_pts_present", &rr_cfg_common->srs_ul_cfg_common.setup().srs_max_up_pts_present)
+  );
+  // NOTE: opt::setup indicates present
+  // srs_ul_cnfg.add_field(
+  //   new parser::field<bool>
+  //   ("max_up_pts_present", &data->rr_config_common_sib.srs_ul_cnfg.max_up_pts_present)
+  // );
+  // srs_ul_cnfg.add_field(
+  //   new parser::field<bool>
+  //   ("present", &data->rr_config_common_sib.srs_ul_cnfg.present)
+  // );
+
   // PUCCH configuration
   parser::section pucch_cnfg("pucch_cnfg");
   rr_config.add_subsection(&pucch_cnfg);
@@ -2271,10 +2300,12 @@ int parse_sibs(all_args_t* args_, rrc_cfg_t* rrc_cfg_, srsenb::phy_cfg_t* phy_co
   if (sib_sections::parse_sib2(args_->enb_files.sib_config, sib2) != SRSRAN_SUCCESS) {
     return SRSRAN_ERROR;
   }
-  
+
   // NOTE: Here indicates SRS is not supported on eNB
   // SRS not yet supported
-  sib2->rr_cfg_common.srs_ul_cfg_common.set(srs_ul_cfg_common_c::types::release);
+  // Force to enable srs
+  // sib2->rr_cfg_common.srs_ul_cfg_common.set(srs_ul_cfg_common_c::types::release);
+  sib2->rr_cfg_common.srs_ul_cfg_common.set(srs_ul_cfg_common_c::types::setup);
   if (sib2->freq_info.ul_bw_present) {
     asn1::number_to_enum(sib2->freq_info.ul_bw, args_->enb.n_prb);
   }

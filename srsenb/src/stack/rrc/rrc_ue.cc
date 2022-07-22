@@ -512,15 +512,13 @@ void rrc::ue::send_connection_setup()
 
   // Configure Sounding Reference Signal
   // NOTE: enable srs by set present to true
-  // FIXME: parent->sib2.rr_config_common_sib.srs_ul_cnfg.present, sib2 doesn't exist in parent
   bool srs_present = parent->cfg.sibs[1].sib2().rr_cfg_common.srs_ul_cfg_common.type(); 
-  
+
   auto* phy_cfg = &rr_cfg.phys_cfg_ded;
   if (srs_present) {
     fprintf(stderr, "[M: %s] establish configuration srs\n", __func__);
     phy_cfg->srs_ul_cfg_ded_present = true;
-    phy_cfg->srs_ul_cfg_ded.set(srs_ul_cfg_common_c::types::setup); // setup present
-    auto& srs_setup = phy_cfg->srs_ul_cfg_ded.setup();
+    auto& srs_setup = phy_cfg->srs_ul_cfg_ded.set_setup();
     srs_setup.srs_bw.value = srs_ul_cfg_ded_c::setup_s_::srs_bw_opts::bw0;
     srs_setup.srs_hop_bw.value = srs_ul_cfg_ded_c::setup_s_::srs_hop_bw_opts::hbw0;
     srs_setup.cyclic_shift.value = srs_ul_cfg_ded_c::setup_s_::cyclic_shift_opts::cs0;
@@ -528,8 +526,10 @@ void rrc::ue::send_connection_setup()
     srs_setup.srs_cfg_idx = 167;
     srs_setup.tx_comb = 0;
     srs_setup.dur = true;
-    // phy_cfg->srs_ul_cfg_ded_v1020.set_present();
-    // phy_cfg->srs_ul_cfg_ded_v1310.set_present();    
+    phy_cfg->srs_ul_cfg_ded_v1020.set_present();
+    phy_cfg->srs_ul_cfg_ded_v1020.get()->srs_ant_port_r10.value = srs_ant_port_opts::an1;
+    phy_cfg->srs_ul_cfg_ded_aperiodic_r10.set_present();
+    phy_cfg->srs_ul_cfg_ded_aperiodic_r10.get()->set(setup_opts::release);
   }
 
   // Configure PHY layer

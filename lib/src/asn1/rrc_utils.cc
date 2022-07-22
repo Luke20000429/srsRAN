@@ -639,6 +639,7 @@ void set_phy_cfg_t_dedicated_cfg(phy_cfg_t* cfg, const asn1::rrc::phys_cfg_ded_s
       cfg->ul_cfg.srs.k_tc       = asn1_type.srs_ul_cfg_ded.setup().tx_comb;
       cfg->ul_cfg.srs.n_srs      = asn1_type.srs_ul_cfg_ded.setup().cyclic_shift;
       fprintf(stderr, "[M: %s] srs.configured = %d!\n", __func__, cfg->ul_cfg.srs.configured);
+      fprintf(stderr, "[M: %s] srs.srs_cfg_idx = %u!\n", __func__, cfg->ul_cfg.srs.I_srs);
     }
   }
 

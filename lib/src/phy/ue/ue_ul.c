@@ -625,7 +625,7 @@ bool srsran_ue_ul_gen_sr(srsran_ue_ul_cfg_t* cfg, srsran_ul_sf_cfg_t* sf, srsran
 
 int srsran_ue_ul_encode(srsran_ue_ul_t* q, srsran_ul_sf_cfg_t* sf, srsran_ue_ul_cfg_t* cfg, srsran_pusch_data_t* data)
 {
-  fprintf(stderr, "[M: %s] called!\n", __func__);
+  // fprintf(stderr, "[M: %s] called!\n", __func__);
   int ret = SRSRAN_SUCCESS;
 
   /* Convert DTX to NACK in channel-selection mode (Release 10 only)*/

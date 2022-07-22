@@ -789,6 +789,7 @@ bool cc_worker::encode_uplink(mac_interface_phy_lte::tb_action_ul_t* action, srs
   }
 
   // Encode signal
+  // NOTE: SRS is attached inside this function
   int ret = srsran_ue_ul_encode(&ue_ul, &sf_cfg_ul, &ue_ul_cfg, &data);
   if (ret < 0) {
     Error("Encoding UL cc=%d", cc_idx);

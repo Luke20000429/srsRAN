@@ -514,6 +514,23 @@ void rrc::ue::send_connection_setup()
   // Configure PHY layer
   apply_setup_phy_config_dedicated(rr_cfg.phys_cfg_ded); // It assumes SCell has not been set before
 
+  // Configure Sounding Reference Signal
+  // NOTE: enable srs by set present to true
+  // FIXME: parent->sib2.rr_config_common_sib.srs_ul_cnfg.present, sib2 doesn't exist in parent
+  bool srs_present = true; 
+  auto* phy_cfg = &rr_cfg.phys_cfg_ded;
+  if (srs_present) {
+    fprintf(stderr, "Establish configuration srs\n");
+    // phy_cfg->srs_ul_cfg_ded_present = 1;
+    phy_cfg->srs_ul_cfg_ded.set_setup();
+    phy_cfg->srs_ul_cfg_ded_v1020.set_present();
+    phy_cfg->srs_ul_cfg_ded_v1310.set_present();
+    // srsran::set_phy_cfg_t_common_srs();
+    
+  }
+
+
+
   std::string octet_str;
   send_dl_ccch(&dl_ccch_msg, &octet_str);
 

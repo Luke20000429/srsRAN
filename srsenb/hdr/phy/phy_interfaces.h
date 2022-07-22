@@ -89,7 +89,7 @@ struct phy_cfg_t {
   asn1::rrc::pdsch_cfg_common_s  pdsch_cnfg;
   asn1::rrc::pusch_cfg_common_s  pusch_cnfg;
   asn1::rrc::pucch_cfg_common_s  pucch_cnfg;
-  asn1::rrc::srs_ul_cfg_common_c srs_ul_cnfg;
+  asn1::rrc::srs_ul_cfg_common_c srs_ul_cnfg; // NOTE: cnfg of SRS
 
   srsran_cfr_cfg_t cfr_config;
 };

@@ -2473,7 +2473,7 @@ struct rr_cfg_common_s {
   bool                 pdsch_cfg_common_present   = false;
   bool                 phich_cfg_present          = false;
   bool                 pucch_cfg_common_present   = false;
-  bool                 srs_ul_cfg_common_present  = false;
+  bool                 srs_ul_cfg_common_present  = false; // NOTE: This should be true for srs
   bool                 ul_pwr_ctrl_common_present = false;
   bool                 ant_info_common_present    = false;
   bool                 p_max_present              = false;
@@ -2484,7 +2484,7 @@ struct rr_cfg_common_s {
   pusch_cfg_common_s   pusch_cfg_common;
   phich_cfg_s          phich_cfg;
   pucch_cfg_common_s   pucch_cfg_common;
-  srs_ul_cfg_common_c  srs_ul_cfg_common;
+  srs_ul_cfg_common_c  srs_ul_cfg_common; // NOTE: This should be configed for srs
   ul_pwr_ctrl_common_s ul_pwr_ctrl_common;
   ant_info_common_s    ant_info_common;
   int8_t               p_max = -30;

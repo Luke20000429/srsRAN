@@ -2030,7 +2030,8 @@ int parse_sib2(std::string filename, sib_type2_s* data)
 
   // NOTE: modify parser to force enable srs_ul
   // SRS_UL_CNFG configuration
-  parser::section srs_ul_cnfg("srs_ul");
+  fprintf(stderr, "[M: %s] parse SRS_UL_CNFG\n", __func__);
+  parser::section srs_ul_cnfg("srs_ul_cnfg");
   rr_config.add_subsection(&srs_ul_cnfg);
 
   srs_ul_cnfg.add_field(
@@ -2047,10 +2048,11 @@ int parse_sib2(std::string filename, sib_type2_s* data)
     new parser::field<bool>
     ("max_up_pts_present", &rr_cfg_common->srs_ul_cfg_common.setup().srs_max_up_pts_present)
   );
+  // fprintf(stderr, "[M: %s] setup SRS_UL_CNFG as %d\n", __func__, rr_cfg_common->srs_ul_cfg_common.type().value);
   // NOTE: opt::setup indicates present
   // srs_ul_cnfg.add_field(
   //   new parser::field<bool>
-  //   ("max_up_pts_present", &data->rr_config_common_sib.srs_ul_cnfg.max_up_pts_present)
+  //   ("max_up_pts", &data->rr_config_common_sib.srs_ul_cnfg.max_up_pts)
   // );
   // srs_ul_cnfg.add_field(
   //   new parser::field<bool>

@@ -510,25 +510,30 @@ void rrc::ue::send_connection_setup()
   apply_pdcp_drb_updates(setup_r8.rr_cfg_ded);
   apply_rlc_rb_updates(setup_r8.rr_cfg_ded);
 
-  // Configure PHY layer
-  apply_setup_phy_config_dedicated(rr_cfg.phys_cfg_ded); // It assumes SCell has not been set before
-
   // Configure Sounding Reference Signal
   // NOTE: enable srs by set present to true
   // FIXME: parent->sib2.rr_config_common_sib.srs_ul_cnfg.present, sib2 doesn't exist in parent
-  bool srs_present = true; 
+  bool srs_present = parent->cfg.sibs[1].sib2().rr_cfg_common.srs_ul_cfg_common.type(); 
+  
   auto* phy_cfg = &rr_cfg.phys_cfg_ded;
   if (srs_present) {
-    fprintf(stderr, "Establish configuration srs\n");
-    // phy_cfg->srs_ul_cfg_ded_present = 1;
-    phy_cfg->srs_ul_cfg_ded.set_setup();
-    phy_cfg->srs_ul_cfg_ded_v1020.set_present();
-    phy_cfg->srs_ul_cfg_ded_v1310.set_present();
-    // srsran::set_phy_cfg_t_common_srs();
-    
+    fprintf(stderr, "[M: %s] establish configuration srs\n", __func__);
+    phy_cfg->srs_ul_cfg_ded_present = true;
+    phy_cfg->srs_ul_cfg_ded.set(srs_ul_cfg_common_c::types::setup); // setup present
+    auto& srs_setup = phy_cfg->srs_ul_cfg_ded.setup();
+    srs_setup.srs_bw.value = srs_ul_cfg_ded_c::setup_s_::srs_bw_opts::bw0;
+    srs_setup.srs_hop_bw.value = srs_ul_cfg_ded_c::setup_s_::srs_hop_bw_opts::hbw0;
+    srs_setup.cyclic_shift.value = srs_ul_cfg_ded_c::setup_s_::cyclic_shift_opts::cs0;
+    srs_setup.freq_domain_position = 0;
+    srs_setup.srs_cfg_idx = 167;
+    srs_setup.tx_comb = 0;
+    srs_setup.dur = true;
+    // phy_cfg->srs_ul_cfg_ded_v1020.set_present();
+    // phy_cfg->srs_ul_cfg_ded_v1310.set_present();    
   }
 
-
+  // Configure PHY layer
+  apply_setup_phy_config_dedicated(rr_cfg.phys_cfg_ded); // It assumes SCell has not been set before
 
   std::string octet_str;
   send_dl_ccch(&dl_ccch_msg, &octet_str);

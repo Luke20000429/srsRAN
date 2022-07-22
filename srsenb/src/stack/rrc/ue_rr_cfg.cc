@@ -515,7 +515,9 @@ void fill_scells_reconf(asn1::rrc::rrc_conn_recfg_r8_ies_s&  recfg_r8,
       cqi_setup.simul_ack_nack_and_cqi = enb_cfg.cqi_cfg.simultaneousAckCQI;
     }
 
-#if SRS_ENABLED
+// NOTE: force to enable SRS here
+// #if SRS_ENABLED
+    fprintf(stderr, "[M: %s] force to enable SRS_r10\n", __func__);
     ul_cfg_ded.srs_ul_cfg_ded_r10_present   = true;
     auto& srs_setup                         = ul_cfg_ded.srs_ul_cfg_ded_r10.set_setup();
     srs_setup.srs_bw.value                  = srs_ul_cfg_ded_c::setup_s_::srs_bw_opts::bw0;
@@ -529,7 +531,7 @@ void fill_scells_reconf(asn1::rrc::rrc_conn_recfg_r8_ies_s&  recfg_r8,
     asn1::number_to_enum(ul_cfg_ded.srs_ul_cfg_ded_v1020.srs_ant_port_r10, enb_cfg.cell.nof_ports);
     ul_cfg_ded.srs_ul_cfg_ded_aperiodic_r10_present = true;
     ul_cfg_ded.srs_ul_cfg_ded_aperiodic_r10.set(setup_opts::release);
-#endif // SRS_ENABLED
+// #endif // SRS_ENABLED
   }
 
   // Fill RRCConnectionReconf message

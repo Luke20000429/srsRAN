@@ -300,7 +300,7 @@ static void apply_norm(srsran_ue_ul_t* q, srsran_ue_ul_cfg_t* cfg, float norm_fa
 
 static void add_srs(srsran_ue_ul_t* q, srsran_ue_ul_cfg_t* cfg, uint32_t tti)
 {
-  // fprintf(stderr, "[M: %s] called!\n", __func__);
+  fprintf(stderr, "[M: %s] called!\n", __func__);
   // NOTE: srs_tx is disabled by default
   if (srs_tx_enabled(&cfg->ul_cfg.srs, tti)) {
     fprintf(stderr, "[M: %s] srs tx is enabled!\n", __func__);

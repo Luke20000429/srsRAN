@@ -270,6 +270,7 @@ int rrc::add_user(uint16_t rnti, const sched_interface::ue_cfg_t& sched_ue_cfg)
  */
 void rrc::upd_user(uint16_t new_rnti, uint16_t old_rnti)
 {
+  fprintf(stderr, "[M: %s] called!\n", __func__);
   // Remove new_rnti
   auto new_ue_it = users.find(new_rnti);
   if (new_ue_it != users.end()) {
@@ -433,6 +434,7 @@ int rrc::release_erab(uint16_t rnti, uint16_t erab_id)
 
 int rrc::notify_ue_erab_updates(uint16_t rnti, srsran::const_byte_span nas_pdu)
 {
+  fprintf(stderr, "[M: %s] called!\n", __func__);
   auto user_it = users.find(rnti);
   if (user_it == users.end()) {
     logger.warning("Unrecognised rnti: 0x%x", rnti);
@@ -578,6 +580,7 @@ void rrc::set_erab_status(uint16_t rnti, const asn1::s1ap::bearers_subject_to_st
 
 void rrc::sgnb_addition_ack(uint16_t eutra_rnti, sgnb_addition_ack_params_t params)
 {
+  fprintf(stderr, "[M: %s] called!\n", __func__);
   logger.info("Received SgNB addition acknowledgement for rnti=0x%x", eutra_rnti);
   auto ue_it = users.find(eutra_rnti);
   if (ue_it == users.end()) {

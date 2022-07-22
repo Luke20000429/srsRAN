@@ -209,6 +209,8 @@ int fill_cqi_report_reconf(cqi_report_cfg_s& cqi_rep, const rrc_cfg_t& enb_cfg, 
 /// Fills ASN1 PhysicalConfigurationDedicated struct with eNB config params at startup
 void fill_phy_cfg_ded_enb_cfg(phys_cfg_ded_s& phy_cfg, const rrc_cfg_t& enb_cfg)
 {
+  fprintf(stderr, "[M: %s] called!\n", __func__);
+  // NOTE: Modify here
   // PUSCH
   phy_cfg.pusch_cfg_ded_present = true;
   phy_cfg.pusch_cfg_ded         = enb_cfg.pusch_cfg;
@@ -418,6 +420,7 @@ void fill_scells_reconf(asn1::rrc::rrc_conn_recfg_r8_ies_s&  recfg_r8,
                         const ue_cell_ded_list&              ue_cell_list,
                         const srsran::rrc_ue_capabilities_t& ue_caps)
 {
+  fprintf(stderr, "[M: %s] called!\n", __func__);
   // check whether there has been scell updates
   // TODO: check scell modifications and released as well
   if (current_scells.size() + 1 == ue_cell_list.nof_cells()) {
@@ -431,12 +434,13 @@ void fill_scells_reconf(asn1::rrc::rrc_conn_recfg_r8_ies_s&  recfg_r8,
     }
     if (ue_cc_idx == ue_cell_list.nof_cells()) {
       // no change has occurred
+      // NOTE: function stops here
       return;
     }
   }
 
   scell_to_add_mod_list_r10_l target_scells(ue_cell_list.nof_cells() - 1);
-  for (size_t ue_cc_idx = 1; ue_cc_idx < ue_cell_list.nof_cells(); ++ue_cc_idx) {
+  for (size_t ue_cc_idx = 0; ue_cc_idx < ue_cell_list.nof_cells(); ++ue_cc_idx) {
     const ue_cell_ded&     scell     = *ue_cell_list.get_ue_cc_idx(ue_cc_idx);
     const enb_cell_common& scell_cfg = *scell.cell_common;
     const sib_type1_s&     cell_sib1 = scell_cfg.sib1;
@@ -515,7 +519,8 @@ void fill_scells_reconf(asn1::rrc::rrc_conn_recfg_r8_ies_s&  recfg_r8,
       cqi_setup.simul_ack_nack_and_cqi = enb_cfg.cqi_cfg.simultaneousAckCQI;
     }
 
-#if SRS_ENABLED
+// #if SRS_ENABLED
+    fprintf(stderr, "[M: %s] force to ENABLE SRS, set up SRS\n", __func__);
     ul_cfg_ded.srs_ul_cfg_ded_r10_present   = true;
     auto& srs_setup                         = ul_cfg_ded.srs_ul_cfg_ded_r10.set_setup();
     srs_setup.srs_bw.value                  = srs_ul_cfg_ded_c::setup_s_::srs_bw_opts::bw0;
@@ -529,7 +534,7 @@ void fill_scells_reconf(asn1::rrc::rrc_conn_recfg_r8_ies_s&  recfg_r8,
     asn1::number_to_enum(ul_cfg_ded.srs_ul_cfg_ded_v1020.srs_ant_port_r10, enb_cfg.cell.nof_ports);
     ul_cfg_ded.srs_ul_cfg_ded_aperiodic_r10_present = true;
     ul_cfg_ded.srs_ul_cfg_ded_aperiodic_r10.set(setup_opts::release);
-#endif // SRS_ENABLED
+// #endif // SRS_ENABLED
   }
 
   // Fill RRCConnectionReconf message
@@ -594,10 +599,12 @@ int apply_reconf_updates(asn1::rrc::rrc_conn_recfg_r8_ies_s&  recfg_r8,
                          const srsran::rrc_ue_capabilities_t& ue_caps,
                          bool                                 phy_cfg_updated)
 {
+  fprintf(stderr, "[M: %s] called!\n", __func__);
   // Compute pending updates and fill reconf msg
   recfg_r8.rr_cfg_ded_present = true;
   if (fill_rr_cfg_ded_reconf(
           recfg_r8.rr_cfg_ded, current_ue_cfg.rr_cfg, enb_cfg, ue_cell_list, bearers, ue_caps, phy_cfg_updated)) {
+    fprintf(stderr, "[M: %s] fail!\n", __func__);
     return SRSRAN_ERROR;
   }
   fill_scells_reconf(recfg_r8, current_ue_cfg.scells, enb_cfg, ue_cell_list, ue_caps);

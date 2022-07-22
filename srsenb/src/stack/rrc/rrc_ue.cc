@@ -326,6 +326,7 @@ bool rrc::ue::is_idle()
 
 void rrc::ue::parse_ul_dcch(uint32_t lcid, srsran::unique_byte_buffer_t pdu)
 {
+  fprintf(stderr, "[M: %s] called!\n", __func__);
   ul_dcch_msg_s  ul_dcch_msg;
   asn1::cbit_ref bref(pdu->msg, pdu->N_bytes);
   if (ul_dcch_msg.unpack(bref) != asn1::SRSASN_SUCCESS or
@@ -345,7 +346,7 @@ void rrc::ue::parse_ul_dcch(uint32_t lcid, srsran::unique_byte_buffer_t pdu)
   }
 
   transaction_id = 0;
-
+  fprintf(stderr, "[M: %s] dcch type %s!\n", __func__, ul_dcch_msg.msg.c1().type().to_string());
   switch (ul_dcch_msg.msg.c1().type()) {
     case ul_dcch_msg_type_c::c1_c_::types::rrc_conn_setup_complete:
       save_ul_message(std::move(original_pdu));
@@ -788,6 +789,7 @@ void rrc::ue::send_connection_reest(uint8_t ncc)
 
 void rrc::ue::handle_rrc_con_reest_complete(rrc_conn_reest_complete_s* msg, srsran::unique_byte_buffer_t pdu)
 {
+  fprintf(stderr, "[M: %s] called!\n", __func__);
   // Log event.
   asn1::json_writer json_writer;
   msg->to_json(json_writer);
@@ -850,6 +852,7 @@ void rrc::ue::send_connection_reconf(srsran::unique_byte_buffer_t pdu,
                                      bool                         phy_cfg_updated,
                                      srsran::const_byte_span      nas_pdu)
 {
+  fprintf(stderr, "[M: %s] called!\n", __func__);
   parent->logger.debug("RRC state %d", state);
 
   update_scells();
@@ -1261,6 +1264,7 @@ enb_cell_common* rrc::ue::get_ue_cc_cfg(uint32_t ue_cc_idx)
 
 void rrc::ue::update_scells()
 {
+  fprintf(stderr, "[M: %s] called!\n", __func__);
   const ue_cell_ded*     pcell     = ue_cell_list.get_ue_cc_idx(UE_PCELL_CC_IDX);
   const enb_cell_common* pcell_cfg = pcell->cell_common;
 

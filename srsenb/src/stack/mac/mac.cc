@@ -32,7 +32,7 @@
 #include "srsran/interfaces/enb_rrc_interface_mac.h"
 #include "srsran/srslog/event_trace.h"
 
-// #define WRITE_SIB_PCAP
+#define WRITE_SIB_PCAP
 using namespace asn1::rrc;
 
 namespace srsenb {
@@ -761,6 +761,8 @@ int mac::get_dl_sched(uint32_t tti_tx_dl, dl_sched_list_t& dl_sched_res_list)
 #ifdef WRITE_SIB_PCAP
         if (pcap) {
           pcap->write_dl_sirnti(dl_sched_res->pdsch[n].data[0], sched_result.bc[i].tbs, true, tti_tx_dl, enb_cc_idx);
+        } else {
+          fprintf(stderr, "[M: %s] pcap is null", __func__);
         }
         if (pcap_net) {
           pcap_net->write_dl_sirnti(

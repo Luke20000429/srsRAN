@@ -523,7 +523,7 @@ void rrc::ue::send_connection_setup()
     srs_setup.srs_hop_bw.value = srs_ul_cfg_ded_c::setup_s_::srs_hop_bw_opts::hbw0;
     srs_setup.cyclic_shift.value = srs_ul_cfg_ded_c::setup_s_::cyclic_shift_opts::cs0;
     srs_setup.freq_domain_position = 0;
-    srs_setup.srs_cfg_idx = 167;
+    srs_setup.srs_cfg_idx = 13;
     srs_setup.tx_comb = 0;
     srs_setup.dur = true;
     phy_cfg->srs_ul_cfg_ded_v1020.set_present();

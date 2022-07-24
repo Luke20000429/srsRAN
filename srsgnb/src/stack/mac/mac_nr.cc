@@ -29,7 +29,7 @@
 #include "srsran/common/time_prof.h"
 #include "srsran/mac/mac_rar_pdu_nr.h"
 
-//#define WRITE_SIB_PCAP
+#define WRITE_SIB_PCAP
 
 namespace srsenb {
 

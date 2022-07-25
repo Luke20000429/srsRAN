@@ -516,18 +516,19 @@ void rrc::ue::send_connection_setup()
 
   auto* phy_cfg = &rr_cfg.phys_cfg_ded;
   if (srs_present) {
-    fprintf(stderr, "[M: %s] establish configuration srs\n", __func__);
+    fprintf(stderr, "[M: %s] establish configuration srs at port %u\n", __func__, parent->cfg.cell.nof_ports);
     phy_cfg->srs_ul_cfg_ded_present = true;
     auto& srs_setup = phy_cfg->srs_ul_cfg_ded.set_setup();
     srs_setup.srs_bw.value = srs_ul_cfg_ded_c::setup_s_::srs_bw_opts::bw0;
     srs_setup.srs_hop_bw.value = srs_ul_cfg_ded_c::setup_s_::srs_hop_bw_opts::hbw0;
     srs_setup.cyclic_shift.value = srs_ul_cfg_ded_c::setup_s_::cyclic_shift_opts::cs0;
     srs_setup.freq_domain_position = 0;
-    srs_setup.srs_cfg_idx = 13;
+    srs_setup.srs_cfg_idx = 167;
     srs_setup.tx_comb = 0;
     srs_setup.dur = true;
     phy_cfg->srs_ul_cfg_ded_v1020.set_present();
-    phy_cfg->srs_ul_cfg_ded_v1020.get()->srs_ant_port_r10.value = srs_ant_port_opts::an1;
+    asn1::number_to_enum(phy_cfg->srs_ul_cfg_ded_v1020.get()->srs_ant_port_r10, parent->cfg.cell.nof_ports);
+    // phy_cfg->srs_ul_cfg_ded_v1020.get()->srs_ant_port_r10.value = srs_ant_port_opts::an1;
     phy_cfg->srs_ul_cfg_ded_aperiodic_r10.set_present();
     phy_cfg->srs_ul_cfg_ded_aperiodic_r10.get()->set(setup_opts::release);
   }

@@ -310,12 +310,16 @@ static void add_srs(srsran_ue_ul_t* q, srsran_ue_ul_cfg_t* cfg, uint32_t tti)
       srsran_refsignal_srs_gen(&q->signals, &cfg->ul_cfg.srs, &cfg->ul_cfg.dmrs, tti % 10, q->srs_signal);
       srsran_refsignal_srs_put(&q->signals, &cfg->ul_cfg.srs, tti, q->srs_signal, q->sf_symbols);
     }
+    fprintf(stderr, "[M: %s] put srs\n", __func__);
+    printf("srs[1] = %f + i%f\n", creal(q->srs_signal[1]), cimag(q->srs_signal[1]));
+    printf("srs[2] = %f + i%f\n", creal(q->srs_signal[2]), cimag(q->srs_signal[2]));
+    printf("srs[100] = %f + i%f\n", creal(q->srs_signal[100]), cimag(q->srs_signal[100]));
   }
 }
 
 static int pusch_encode(srsran_ue_ul_t* q, srsran_ul_sf_cfg_t* sf, srsran_ue_ul_cfg_t* cfg, srsran_pusch_data_t* data)
 {
-  fprintf(stderr, "[M: %s] called!\n", __func__);
+  // fprintf(stderr, "[M: %s] called!\n", __func__);
 
   int ret = SRSRAN_ERROR_INVALID_INPUTS;
 
@@ -516,7 +520,7 @@ void srsran_ue_ul_pucch_resource_selection(const srsran_cell_t*      cell,
 static int
 pucch_encode(srsran_ue_ul_t* q, srsran_ul_sf_cfg_t* sf, srsran_ue_ul_cfg_t* cfg, srsran_uci_value_t* uci_data)
 {
-  fprintf(stderr, "[M: %s] called!\n", __func__);
+  // fprintf(stderr, "[M: %s] called!\n", __func__);
 
   int ret = SRSRAN_ERROR_INVALID_INPUTS;
 

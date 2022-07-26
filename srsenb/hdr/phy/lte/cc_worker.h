@@ -78,6 +78,9 @@ private:
   int  encode_pdcch_ul(stack_interface_phy_lte::ul_sched_grant_t* grants, uint32_t nof_grants);
   int  decode_pucch();
 
+  /* NOTE: customized functions */
+  int  extract_srs(stack_interface_phy_lte::ul_sched_grant_t* grants, uint32_t nof_pusch);
+
   /* Common objects */
   srslog::basic_logger& logger;
   phy_common*           phy       = nullptr;

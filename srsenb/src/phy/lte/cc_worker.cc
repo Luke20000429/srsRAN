@@ -20,6 +20,7 @@
  */
 
 #include <iomanip>
+#include <ccomplex>
 
 #include "srsran/common/threads.h"
 #include "srsran/srsran.h"
@@ -86,6 +87,7 @@ cc_worker::~cc_worker()
 FILE* f;
 #endif
 
+// NOTE: adapt from phch_worker 
 void cc_worker::init(phy_common* phy_, uint32_t cc_idx_)
 {
   phy                         = phy_;
@@ -169,6 +171,7 @@ void cc_worker::reset()
   ue_db.clear();
 }
 
+// NOTE: get buffer here
 cf_t* cc_worker::get_buffer_rx(uint32_t antenna_idx)
 {
   return signal_buffer_rx[antenna_idx];
@@ -220,12 +223,55 @@ void cc_worker::work_ul(const srsran_ul_sf_cfg_t& ul_sf_cfg, stack_interface_phy
 
   // Process UL signal
   srsran_enb_ul_fft(&enb_ul);
-
+  
   // Decode pending UL grants for the tti they were scheduled
   decode_pusch(ul_grants.pusch, ul_grants.nof_grants);
 
+  // cf_t *signal = enb_ul.fft.cfg.out_buffer; // fft_out_buffer
+  extract_srs(ul_grants.pusch, ul_grants.nof_grants);
+
   // Decode remaining PUCCH ACKs not associated with PUSCH transmission and SR signals
   decode_pucch();
+}
+
+// NOTE: function to extract srs
+int cc_worker::extract_srs(stack_interface_phy_lte::ul_sched_grant_t* grants, uint32_t nof_pusch) {
+  srsran_chest_ul_t* q = &enb_ul.chest;
+  for (uint32_t i = 0; i < nof_pusch; i++) {
+    // Get grant itself and RNTI
+    stack_interface_phy_lte::ul_sched_grant_t& ul_grant = grants[i];
+    uint16_t                                   rnti     = ul_grant.dci.rnti;
+
+    srsran_ul_cfg_t    ul_cfg    = {};
+
+    // Get UE configuration
+    if (phy->ue_db.get_ul_config(rnti, cc_idx, ul_cfg) < SRSRAN_SUCCESS) {
+      // It could happen that the UL configuration is missing due to intra-enb HO which is not an error
+      fprintf(stderr, "[M: %s] failed retrieving UL configuration for cc=%d rnti=0x%x\n", __func__, cc_idx, rnti);
+      return -1;
+    }
+
+    // check ul_cfg
+    auto& srs_cfg = ul_cfg.srs;
+    fprintf(stderr, "[M: %s] TEST: bw_cfg=%d; sf_cfg=%d; B=%d; b_hops=%d; n_srs=%d; I_srs=%d;\n", __func__,
+        srs_cfg.bw_cfg,
+        srs_cfg.subframe_config,
+        srs_cfg.B,
+        srs_cfg.b_hop,
+        srs_cfg.n_srs,
+        srs_cfg.I_srs);
+
+    // NOTE: get out buffer pointer, extract srs
+    if (srsran_refsignal_srs_get(&q->dmrs_signal, &srs_cfg, ul_sf.tti, q->pilot_recv_signal, enb_ul.sf_symbols) != SRSRAN_SUCCESS) {
+      fprintf(stderr, "[M: %s] failed to get srs at nof: %u\n", __func__, i);
+      return -1;
+    }
+    int M_sc = 288;
+    complex<float> srs_i = q->pilot_recv_signal[1];
+    fprintf(stderr, "[M: %s] get srs at nof: %u\n", __func__, i);
+    printf("srs[1] = %f + i%f\n", real(srs_i), imag(srs_i));
+  }
+  return SRSRAN_SUCCESS;
 }
 
 void cc_worker::work_dl(const srsran_dl_sf_cfg_t&            dl_sf_cfg,
@@ -393,6 +439,7 @@ void cc_worker::decode_pusch(stack_interface_phy_lte::ul_sched_grant_t* grants, 
 
     // Decodes PUSCH for the given grant
     if (!decode_pusch_rnti(ul_grant, ul_cfg, pusch_res)) {
+      // NOTE: fill up ul_cfg
       return;
     }
 

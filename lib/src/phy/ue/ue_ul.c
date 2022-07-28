@@ -321,9 +321,9 @@ static void add_srs(srsran_ue_ul_t* q, srsran_ue_ul_cfg_t* cfg, uint32_t tti)
     if (!srs_written) {
       f = fopen(debug_filename, "w");
       fprintf(stderr, "[M: %s] srs tx is enabled!\n", __func__);
-      int M_sc = 288;
+      uint32_t M_sc = srsran_refsignal_srs_M_sc(&q->signals, &cfg->ul_cfg.srs);
       fwrite(q->srs_signal, sizeof(cf_t), M_sc, f);
-      fprintf(stderr, "[M: %s] save srs to %s, size: %zu\n", __func__, debug_filename, sizeof(cf_t) * M_sc);
+      fprintf(stderr, "[M: %s] save srs to %s, size: %u\n", __func__, debug_filename, M_sc);
       srs_written = true;
       fclose(f);
     }

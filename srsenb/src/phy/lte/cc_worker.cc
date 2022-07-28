@@ -255,21 +255,21 @@ int cc_worker::extract_srs(stack_interface_phy_lte::ul_sched_grant_t* grants, ui
 
     // check ul_cfg
     auto& srs_cfg = ul_cfg.srs;
-    fprintf(stderr, "[M: %s] TEST: bw_cfg=%d; sf_cfg=%d; B=%d; b_hops=%d; n_srs=%d; I_srs=%d;\n", __func__,
-        srs_cfg.bw_cfg,
-        srs_cfg.subframe_config,
-        srs_cfg.B,
-        srs_cfg.b_hop,
-        srs_cfg.n_srs,
-        srs_cfg.I_srs);
+    // fprintf(stderr, "[M: %s] TEST: bw_cfg=%d; sf_cfg=%d; B=%d; b_hops=%d; n_srs=%d; I_srs=%d;\n", __func__,
+    //     srs_cfg.bw_cfg,
+    //     srs_cfg.subframe_config,
+    //     srs_cfg.B,
+    //     srs_cfg.b_hop,
+    //     srs_cfg.n_srs,
+    //     srs_cfg.I_srs);
 
     // NOTE: get out buffer pointer, extract srs
     if (srsran_refsignal_srs_get(&q->dmrs_signal, &srs_cfg, ul_sf.tti, q->pilot_recv_signal, enb_ul.sf_symbols) != SRSRAN_SUCCESS) {
       fprintf(stderr, "[M: %s] failed to get srs at nof: %u\n", __func__, i);
       return -1;
     }
-    int M_sc = 288;
-    fprintf(stderr, "[M: %s] get srs at nof: %u\n", __func__, i);
+    int M_sc = srsran_refsignal_srs_M_sc(&q->dmrs_signal, &srs_cfg);;
+    // fprintf(stderr, "[M: %s] get srs at nof: %u\n", __func__, i);
     fwrite(q->pilot_recv_signal, sizeof(cf_t), M_sc, f);
     file_counter++;
     fprintf(stderr, "[M: %s] save %d srs to %s\n", __func__, file_counter, debug_filename);

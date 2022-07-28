@@ -52,7 +52,7 @@ using namespace std;
 
 using namespace asn1::rrc;
 
-//#define DEBUG_WRITE_FILE
+#define DEBUG_WRITE_FILE
 
 namespace srsenb {
 namespace lte {
@@ -85,6 +85,8 @@ cc_worker::~cc_worker()
 
 #ifdef DEBUG_WRITE_FILE
 FILE* f;
+const char* debug_filename = "/home/liuxs/workarea/srsRAN/log/test.dat";
+int file_counter = 0;
 #endif
 
 // NOTE: adapt from phch_worker 
@@ -161,7 +163,7 @@ void cc_worker::init(phy_common* phy_, uint32_t cc_idx_)
   initiated = true;
 
 #ifdef DEBUG_WRITE_FILE
-  f = fopen("test.dat", "w");
+  f = fopen(debug_filename, "w");
 #endif
 }
 
@@ -267,9 +269,10 @@ int cc_worker::extract_srs(stack_interface_phy_lte::ul_sched_grant_t* grants, ui
       return -1;
     }
     int M_sc = 288;
-    complex<float> srs_i = q->pilot_recv_signal[1];
     fprintf(stderr, "[M: %s] get srs at nof: %u\n", __func__, i);
-    printf("srs[1] = %f + i%f\n", real(srs_i), imag(srs_i));
+    fwrite(q->pilot_recv_signal, sizeof(cf_t), M_sc, f);
+    file_counter++;
+    fprintf(stderr, "[M: %s] save %d srs to %s\n", __func__, file_counter, debug_filename);
   }
   return SRSRAN_SUCCESS;
 }

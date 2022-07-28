@@ -36,6 +36,14 @@
 
 #define DEFAULT_CFO_TOL 1.0 // Hz
 
+#define DEBUG_WRITE_FILE
+
+#ifdef DEBUG_WRITE_FILE
+FILE* f = NULL;
+const char* debug_filename = "/home/liuxs/workarea/srsRAN/log/refer.dat";
+bool srs_written = false;
+#endif
+
 static bool srs_tx_enabled(srsran_refsignal_srs_cfg_t* srs_cfg, uint32_t tti);
 
 int srsran_ue_ul_init(srsran_ue_ul_t* q, cf_t* out_buffer, uint32_t max_prb)
@@ -309,6 +317,15 @@ static void add_srs(srsran_ue_ul_t* q, srsran_ue_ul_cfg_t* cfg, uint32_t tti)
     } else {
       srsran_refsignal_srs_gen(&q->signals, &cfg->ul_cfg.srs, &cfg->ul_cfg.dmrs, tti % 10, q->srs_signal);
       srsran_refsignal_srs_put(&q->signals, &cfg->ul_cfg.srs, tti, q->srs_signal, q->sf_symbols);
+    }
+    if (!srs_written) {
+      f = fopen(debug_filename, "w");
+      fprintf(stderr, "[M: %s] srs tx is enabled!\n", __func__);
+      int M_sc = 288;
+      fwrite(q->srs_signal, sizeof(cf_t), M_sc, f);
+      fprintf(stderr, "[M: %s] save srs to %s, size: %zu\n", __func__, debug_filename, sizeof(cf_t) * M_sc);
+      srs_written = true;
+      fclose(f);
     }
   }
 }

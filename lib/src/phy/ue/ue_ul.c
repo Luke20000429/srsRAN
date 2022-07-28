@@ -36,6 +36,14 @@
 
 #define DEFAULT_CFO_TOL 1.0 // Hz
 
+#define DEBUG_WRITE_FILE
+
+#ifdef DEBUG_WRITE_FILE
+FILE* f;
+const char* debug_filename = "/home/xueshen/workarea/code/srsRAN/log/test.dat";
+bool srs_written = false;
+#endif
+
 static bool srs_tx_enabled(srsran_refsignal_srs_cfg_t* srs_cfg, uint32_t tti);
 
 int srsran_ue_ul_init(srsran_ue_ul_t* q, cf_t* out_buffer, uint32_t max_prb)
@@ -303,17 +311,22 @@ static void add_srs(srsran_ue_ul_t* q, srsran_ue_ul_cfg_t* cfg, uint32_t tti)
   // fprintf(stderr, "[M: %s] called!\n", __func__);
   // NOTE: srs_tx is disabled by default
   if (srs_tx_enabled(&cfg->ul_cfg.srs, tti)) {
-    fprintf(stderr, "[M: %s] srs tx is enabled!\n", __func__);
+    
     if (q->signals_pregenerated) {
       srsran_refsignal_srs_pregen_put(&q->signals, &q->pregen_srs, &cfg->ul_cfg.srs, tti, q->sf_symbols);
     } else {
       srsran_refsignal_srs_gen(&q->signals, &cfg->ul_cfg.srs, &cfg->ul_cfg.dmrs, tti % 10, q->srs_signal);
       srsran_refsignal_srs_put(&q->signals, &cfg->ul_cfg.srs, tti, q->srs_signal, q->sf_symbols);
     }
-    fprintf(stderr, "[M: %s] put srs\n", __func__);
-    printf("srs[1] = %f + i%f\n", creal(q->srs_signal[1]), cimag(q->srs_signal[1]));
-    printf("srs[2] = %f + i%f\n", creal(q->srs_signal[2]), cimag(q->srs_signal[2]));
-    printf("srs[100] = %f + i%f\n", creal(q->srs_signal[100]), cimag(q->srs_signal[100]));
+    if (!srs_written) {
+      f = fopen(debug_filename, "w");
+      fprintf(stderr, "[M: %s] srs tx is enabled!\n", __func__);
+      uint32_t M_sc = srsran_refsignal_srs_M_sc(&q->signals, &cfg->ul_cfg.srs);
+      fwrite(q->srs_signal, sizeof(cf_t), M_sc, f);
+      fprintf(stderr, "[M: %s] save srs to %s, size: %u\n", __func__, debug_filename, M_sc);
+      srs_written = true;
+      fclose(f);
+    }
   }
 }
 

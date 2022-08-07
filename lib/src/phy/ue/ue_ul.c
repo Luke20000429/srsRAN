@@ -308,10 +308,10 @@ static void apply_norm(srsran_ue_ul_t* q, srsran_ue_ul_cfg_t* cfg, float norm_fa
 
 static void add_srs(srsran_ue_ul_t* q, srsran_ue_ul_cfg_t* cfg, uint32_t tti)
 {
-  // fprintf(stderr, "[M: %s] called!\n", __func__);
+  fprintf(stderr, "[M: %s] called!\n", __func__);
   // NOTE: srs_tx is disabled by default
   if (srs_tx_enabled(&cfg->ul_cfg.srs, tti)) {
-    
+    fprintf(stderr, "[M: %s] srs tx is enabled at tti= %u!\n", __func__, tti);
     if (q->signals_pregenerated) {
       srsran_refsignal_srs_pregen_put(&q->signals, &q->pregen_srs, &cfg->ul_cfg.srs, tti, q->sf_symbols);
     } else {
@@ -320,7 +320,6 @@ static void add_srs(srsran_ue_ul_t* q, srsran_ue_ul_cfg_t* cfg, uint32_t tti)
     }
     if (!srs_written) {
       f = fopen(debug_filename, "w");
-      fprintf(stderr, "[M: %s] srs tx is enabled!\n", __func__);
       uint32_t M_sc = srsran_refsignal_srs_M_sc(&q->signals, &cfg->ul_cfg.srs);
       fwrite(q->srs_signal, sizeof(cf_t), M_sc, f);
       fprintf(stderr, "[M: %s] save srs to %s, size: %u\n", __func__, debug_filename, M_sc);
@@ -481,6 +480,7 @@ static bool srs_tx_enabled(srsran_refsignal_srs_cfg_t* srs_cfg, uint32_t tti)
       return true;
     }
   }
+  fprintf(stderr, "[M: %s] I_srs: %u, subf_cfg: %u, tti: %u\n", __func__, srs_cfg->I_srs, srs_cfg->subframe_config, tti);
   return false;
 }
 

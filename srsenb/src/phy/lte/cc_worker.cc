@@ -19,8 +19,8 @@
  *
  */
 
-#include <iomanip>
 #include <ccomplex>
+#include <iomanip>
 
 #include "srsran/common/threads.h"
 #include "srsran/srsran.h"
@@ -84,12 +84,12 @@ cc_worker::~cc_worker()
 }
 
 #ifdef DEBUG_WRITE_FILE
-FILE* f;
+FILE*       f;
 const char* debug_filename = "/home/liuxs/workarea/srsRAN/log/test.dat";
-int file_counter = 0;
+int         file_counter   = 0;
 #endif
 
-// NOTE: adapt from phch_worker 
+// NOTE: adapt from phch_worker
 void cc_worker::init(phy_common* phy_, uint32_t cc_idx_)
 {
   phy                         = phy_;
@@ -225,7 +225,7 @@ void cc_worker::work_ul(const srsran_ul_sf_cfg_t& ul_sf_cfg, stack_interface_phy
 
   // Process UL signal
   srsran_enb_ul_fft(&enb_ul);
-  
+
   // Decode pending UL grants for the tti they were scheduled
   decode_pusch(ul_grants.pusch, ul_grants.nof_grants);
 
@@ -237,42 +237,42 @@ void cc_worker::work_ul(const srsran_ul_sf_cfg_t& ul_sf_cfg, stack_interface_phy
 }
 
 // NOTE: function to extract srs
-int cc_worker::extract_srs(stack_interface_phy_lte::ul_sched_grant_t* grants, uint32_t nof_pusch) {
+int cc_worker::extract_srs(stack_interface_phy_lte::ul_sched_grant_t* grants, uint32_t nof_pusch)
+{
   srsran_chest_ul_t* q = &enb_ul.chest;
-  for (uint32_t i = 0; i < nof_pusch; i++) {
+  static srsran_ul_cfg_t *ul_cfg = nullptr;
+  static uint32_t start_tti = 0;
+  if (!ul_cfg && nof_pusch) {
     // Get grant itself and RNTI
-    stack_interface_phy_lte::ul_sched_grant_t& ul_grant = grants[i];
+    stack_interface_phy_lte::ul_sched_grant_t& ul_grant = grants[0];
     uint16_t                                   rnti     = ul_grant.dci.rnti;
 
-    srsran_ul_cfg_t    ul_cfg    = {};
+    ul_cfg = new srsran_ul_cfg_t;
 
     // Get UE configuration
-    if (phy->ue_db.get_ul_config(rnti, cc_idx, ul_cfg) < SRSRAN_SUCCESS) {
+    if (phy->ue_db.get_ul_config(rnti, cc_idx, *ul_cfg) < SRSRAN_SUCCESS) {
       // It could happen that the UL configuration is missing due to intra-enb HO which is not an error
       fprintf(stderr, "[M: %s] failed retrieving UL configuration for cc=%d rnti=0x%x\n", __func__, cc_idx, rnti);
       return -1;
     }
+    start_tti = ul_sf.tti;
+  }
 
-    // check ul_cfg
-    auto& srs_cfg = ul_cfg.srs;
-    // fprintf(stderr, "[M: %s] TEST: bw_cfg=%d; sf_cfg=%d; B=%d; b_hops=%d; n_srs=%d; I_srs=%d;\n", __func__,
-    //     srs_cfg.bw_cfg,
-    //     srs_cfg.subframe_config,
-    //     srs_cfg.B,
-    //     srs_cfg.b_hop,
-    //     srs_cfg.n_srs,
-    //     srs_cfg.I_srs);
-
+  if (ul_cfg && ((ul_sf.tti-start_tti) % 10 == 8)) {
+    auto& srs_cfg = ul_cfg->srs;
     // NOTE: get out buffer pointer, extract srs
-    if (srsran_refsignal_srs_get(&q->dmrs_signal, &srs_cfg, ul_sf.tti, q->pilot_recv_signal, enb_ul.sf_symbols) != SRSRAN_SUCCESS) {
-      fprintf(stderr, "[M: %s] failed to get srs at nof: %u\n", __func__, i);
+    if (srsran_refsignal_srs_get(&q->dmrs_signal, &srs_cfg, ul_sf.tti, q->pilot_recv_signal, enb_ul.sf_symbols) !=
+        SRSRAN_SUCCESS) {
+      fprintf(stderr, "[M: %s] failed to get srs at tti: %u\n", __func__, ul_sf.tti);
       return -1;
     }
-    int M_sc = srsran_refsignal_srs_M_sc(&q->dmrs_signal, &srs_cfg);;
-    // fprintf(stderr, "[M: %s] get srs at nof: %u\n", __func__, i);
-    fwrite(q->pilot_recv_signal, sizeof(cf_t), M_sc, f);
-    file_counter++;
-    fprintf(stderr, "[M: %s] save %d srs to %s\n", __func__, file_counter, debug_filename);
+    fprintf(stderr, "[M: %s] get srs at tti= %u\n", __func__, ul_sf.tti);
+    int M_sc = srsran_refsignal_srs_M_sc(&q->dmrs_signal, &srs_cfg);
+    if (file_counter < 500) {
+      fwrite(q->pilot_recv_signal, sizeof(cf_t), M_sc, f);
+      file_counter++;
+      fprintf(stderr, "[M: %s] save %d srs to %s\n", __func__, file_counter, debug_filename);
+    }
   }
   return SRSRAN_SUCCESS;
 }

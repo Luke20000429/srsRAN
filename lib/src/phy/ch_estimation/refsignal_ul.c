@@ -917,9 +917,14 @@ int srsran_refsignal_srs_get(srsran_refsignal_ul_t*      q,
     uint32_t k0   = srs_k0_ue(cfg, q->cell.nof_prb, tti);
     fprintf(stderr, "[M: %s] M_sc = %u\n", __func__, M_sc);
     for (int i = 0; i < M_sc; i++) {
-      r_srs[i] = sf_symbols[SRSRAN_RE_IDX(q->cell.nof_prb, 2 * SRSRAN_CP_NSYMB(q->cell.cp) - 1, k0 + 2 * i)];
+      int idx = SRSRAN_RE_IDX(q->cell.nof_prb, 2 * SRSRAN_CP_NSYMB(q->cell.cp) - 1, k0 + 2 * i);
+      // FIXME: show idx in sf_symbols
+      double complex symbol = sf_symbols[idx+1];
+      fprintf(stderr, "[M: %s] r_srs[%d] = sf_symbols[%d], sf[%d] = %.4f + %.4fi\n", __func__, i, idx, idx+1, creal(symbol), cimag(symbol));
+      r_srs[i] = sf_symbols[idx];
     }
     ret = SRSRAN_SUCCESS;
   }
   return ret;
 }
+

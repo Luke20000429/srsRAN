@@ -915,7 +915,11 @@ int srsran_refsignal_srs_get(srsran_refsignal_ul_t*      q,
   if (r_srs && q && sf_symbols && cfg) {
     uint32_t M_sc = srsran_refsignal_srs_M_sc(q, cfg);
     uint32_t k0   = srs_k0_ue(cfg, q->cell.nof_prb, tti);
-    fprintf(stderr, "[M: %s] M_sc = %u\n", __func__, M_sc);
+    fprintf(stderr, "[M: %s] M_sc = %u, k0 = %u\n", __func__, M_sc, k0);
+    // size_t start = SRSRAN_RE_IDX(q->cell.nof_prb, 2 * SRSRAN_CP_NSYMB(q->cell.cp) - 1, k0);
+    // for (int i = 0; i < 2 * M_sc; i++) {
+    //   r_srs[i] = sf_symbols[start + i];
+    // } 
     for (int i = 0; i < M_sc; i++) {
       r_srs[i] = sf_symbols[SRSRAN_RE_IDX(q->cell.nof_prb, 2 * SRSRAN_CP_NSYMB(q->cell.cp) - 1, k0 + 2 * i)];
     }

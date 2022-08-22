@@ -227,6 +227,7 @@ static uint32_t zc_sequence_q(uint32_t u, uint32_t v, uint32_t N_sz)
 }
 
 // Common for LTE and NR
+// NOTE: compute srs here
 static void zc_sequence_r_uv_arg_mprb(uint32_t M_zc, uint32_t u, uint32_t v, cf_t* tmp_arg)
 {
   int32_t N_sz = srsran_prime_lower_than(M_zc); // N_zc - Zadoff Chu Sequence Length

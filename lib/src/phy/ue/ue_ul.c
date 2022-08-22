@@ -311,7 +311,7 @@ static void add_srs(srsran_ue_ul_t* q, srsran_ue_ul_cfg_t* cfg, uint32_t tti)
   // fprintf(stderr, "[M: %s] called!\n", __func__);
   // NOTE: srs_tx is disabled by default
   if (srs_tx_enabled(&cfg->ul_cfg.srs, tti)) {
-    fprintf(stderr, "[M: %s] srs tx is enabled!\n", __func__);
+    // fprintf(stderr, "[M: %s] srs tx is enabled!\n", __func__);
     if (q->signals_pregenerated) {
       srsran_refsignal_srs_pregen_put(&q->signals, &q->pregen_srs, &cfg->ul_cfg.srs, tti, q->sf_symbols);
     } else {
@@ -332,7 +332,7 @@ static void add_srs(srsran_ue_ul_t* q, srsran_ue_ul_cfg_t* cfg, uint32_t tti)
 
 static int pusch_encode(srsran_ue_ul_t* q, srsran_ul_sf_cfg_t* sf, srsran_ue_ul_cfg_t* cfg, srsran_pusch_data_t* data)
 {
-  fprintf(stderr, "[M: %s] called!\n", __func__);
+  // fprintf(stderr, "[M: %s] called!\n", __func__);
 
   int ret = SRSRAN_ERROR_INVALID_INPUTS;
 
@@ -533,7 +533,7 @@ void srsran_ue_ul_pucch_resource_selection(const srsran_cell_t*      cell,
 static int
 pucch_encode(srsran_ue_ul_t* q, srsran_ul_sf_cfg_t* sf, srsran_ue_ul_cfg_t* cfg, srsran_uci_value_t* uci_data)
 {
-  fprintf(stderr, "[M: %s] called!\n", __func__);
+  // fprintf(stderr, "[M: %s] called!\n", __func__);
 
   int ret = SRSRAN_ERROR_INVALID_INPUTS;
 

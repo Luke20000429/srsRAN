@@ -62,8 +62,20 @@ cc_worker::cc_worker(srslog::basic_logger& logger) : logger(logger)
   reset();
 }
 
+#ifdef DEBUG_WRITE_FILE
+srsran_filesink_t srs_fsink;
+char              fname[] = "/home/liuxs/workarea/srsRAN/log/test.bin";
+int               file_counter = 0;
+int               M_sc = 0;
+cf_t              srs_buffer[300*500];
+#endif
+
 cc_worker::~cc_worker()
 {
+#ifdef DEBUG_WRITE_FILE
+  fprintf(stderr, "[M: %s] Closing file %s\n", __func__, fname);
+  srsran_filesink_free(&srs_fsink);
+#endif
   srsran_softbuffer_tx_free(&temp_mbsfn_softbuffer);
   srsran_enb_dl_free(&enb_dl);
   srsran_enb_ul_free(&enb_ul);
@@ -82,12 +94,6 @@ cc_worker::~cc_worker()
     delete it.second;
   }
 }
-
-#ifdef DEBUG_WRITE_FILE
-FILE*       f;
-const char* debug_filename = "/home/liuxs/workarea/srsRAN/log/test.dat";
-int         file_counter   = 0;
-#endif
 
 // NOTE: adapt from phch_worker
 void cc_worker::init(phy_common* phy_, uint32_t cc_idx_)
@@ -163,7 +169,12 @@ void cc_worker::init(phy_common* phy_, uint32_t cc_idx_)
   initiated = true;
 
 #ifdef DEBUG_WRITE_FILE
-  f = fopen(debug_filename, "w");
+  if (srsran_filesink_init(&srs_fsink, fname, SRSRAN_COMPLEX_FLOAT_BIN)) {
+    fprintf(stderr, "Error opening file %s\n", fname);
+    exit(-1);
+  }
+  // srsran_filesink_write(&debug_fsink, npss_signal, SRSRAN_NPSS_LEN * 11);
+  // srsran_filesink_free(&debug_fsink);
 #endif
 }
 
@@ -258,20 +269,27 @@ int cc_worker::extract_srs(stack_interface_phy_lte::ul_sched_grant_t* grants, ui
     start_tti = ul_sf.tti;
   }
 
-  if (ul_cfg && ((ul_sf.tti-start_tti) % 10 == 8)) {
+  if (ul_cfg && ((ul_sf.tti-start_tti) % 20 == 8)) {
     auto& srs_cfg = ul_cfg->srs;
     // NOTE: get out buffer pointer, extract srs
-    if (srsran_refsignal_srs_get(&q->dmrs_signal, &srs_cfg, ul_sf.tti, q->pilot_recv_signal, enb_ul.sf_symbols) !=
-        SRSRAN_SUCCESS) {
-      fprintf(stderr, "[M: %s] failed to get srs at tti: %u\n", __func__, ul_sf.tti);
-      return -1;
-    }
-    fprintf(stderr, "[M: %s] get srs at tti= %u\n", __func__, ul_sf.tti);
-    int M_sc = srsran_refsignal_srs_M_sc(&q->dmrs_signal, &srs_cfg);
+    // fprintf(stderr, "[M: %s] get srs at tti= %u\n", __func__, ul_sf.tti);
+    M_sc = srsran_refsignal_srs_M_sc(&q->dmrs_signal, &srs_cfg);
+
     if (file_counter < 500) {
-      fwrite(q->pilot_recv_signal, sizeof(cf_t), M_sc, f);
+      // fwrite(q->pilot_recv_signal, sizeof(cf_t), M_sc, f);
+      // srsran_filesink_write(&srs_fsink, q->pilot_recv_signal, M_sc);
+      if (srsran_refsignal_srs_get(&q->dmrs_signal, &srs_cfg, ul_sf.tti, srs_buffer+file_counter*M_sc, enb_ul.sf_symbols) !=
+          SRSRAN_SUCCESS) {
+        fprintf(stderr, "[M: %s] failed to get srs at tti: %u\n", __func__, ul_sf.tti);
+        return -1;
+      }
       file_counter++;
-      fprintf(stderr, "[M: %s] save %d srs to %s\n", __func__, file_counter, debug_filename);
+      // fprintf(stderr, "[M: %s] save %d srs to %s\n", __func__, file_counter, debug_filename);
+    } 
+    else if (file_counter == 500) {
+      srsran_filesink_write(&srs_fsink, srs_buffer, M_sc*file_counter);
+      fprintf(stderr, "[M: %s] save %d srs to %s\n", __func__, file_counter, fname);
+      file_counter++;
     }
   }
   return SRSRAN_SUCCESS;
